@@ -221,6 +221,8 @@ __marimo__/
 
 # Secrets
 *.json
+.env
+.env_encoded
 
 # Local .terraform directories
 .terraform/
