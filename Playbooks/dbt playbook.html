@@ -279,7 +279,7 @@ code.inline { background: #f3f4f6; padding: 2px 6px; border-radius: 6px; font-fa
       </div>
     </div>
 
-    <div class="takeaway">One-line takeaway: dbt turns SQL transformations into a standardized, layered, dependency-aware system.</div>
+    <div class="takeaway">One-line takeaway: dbt is an "ELT tool for managing your SQL transformations and data models."</div>
   </section>
 
   <section class="chapter" id="install">
@@ -550,66 +550,60 @@ code.inline { background: #f3f4f6; padding: 2px 6px; border-radius: 6px; font-fa
       <p class="chapter-subtitle">Commands make more sense once you know what dbt is operating on.</p>
     </div>
 
-    <h3 class="section-title">Core commands</h3>
+    <h3 class="section-title">Commands</h3>
 
-    <div class="code"><span class="cmd">dbt debug</span>
-<span class="comment"># Always run this first. Validates your profile connection and project config.</span>
+<div class="code"><span class="cmd">dbt --help</span></div>
 
-<span class="cmd">dbt run</span>
-<span class="comment"># Executes all models. Builds tables/views in your warehouse.</span>
+<div class="code"><span class="cmd">build</span>          <span class="comment"># Run all seeds, models, snapshots, and tests in DAG order.</span>
+<span class="cmd">clean</span>          <span class="comment"># Delete folders listed in clean-targets.</span>
+<span class="cmd">clone</span>          <span class="comment"># Create clones of selected nodes based on their target location.</span>
+<span class="cmd">compile</span>        <span class="comment"># Generate executable SQL from models, tests, snapshots, and macros.</span>
+<span class="cmd">debug</span>          <span class="comment"># Show information about the current dbt environment and configuration.</span>
+<span class="cmd">deps</span>           <span class="comment"># Install dbt packages specified in packages.yml.</span>
+<span class="cmd">docs</span>           <span class="comment"># Generate or serve the dbt documentation website.</span>
+<span class="cmd">init</span>           <span class="comment"># Initialize a brand new dbt project.</span>
+<span class="cmd">list</span>           <span class="comment"># List the resources defined in your project.</span>
+<span class="cmd">parse</span>          <span class="comment"># Parse the project and report parsing performance information.</span>
+<span class="cmd">retry</span>          <span class="comment"># Retry nodes that failed in the previous invocation.</span>
+<span class="cmd">run</span>            <span class="comment"># Compile SQL and execute models against the current target.</span>
+<span class="cmd">run-operation</span>  <span class="comment"># Execute a named macro with supplied arguments.</span>
+<span class="cmd">seed</span>           <span class="comment"># Load CSV files into your data warehouse.</span>
+<span class="cmd">show</span>           <span class="comment"># Generate executable SQL or preview results for a resource.</span>
+<span class="cmd">snapshot</span>       <span class="comment"># Execute snapshots defined in the project.</span>
+<span class="cmd">source</span>         <span class="comment"># Manage and inspect your project's sources.</span>
+<span class="cmd">test</span>           <span class="comment"># Run tests on deployed models and sources.</span></div>
 
-<span class="cmd">dbt run --select stg_orders</span>
-<span class="comment"># Run just one model</span>
+    <h3 class="section-title">Flags (options)</h3>
 
-<span class="cmd">dbt run --select staging.*</span>
-<span class="comment"># Run all models in the staging/ folder</span>
+<p>dbt CLI commands generally follow this structure:</p>
 
-<span class="cmd">dbt run --select +mart_revenue</span>
-<span class="comment"># Run mart_revenue AND all its upstream dependencies</span>
+<div class="code"><span class="comment">| &lt;program&gt; | &lt;command&gt; | &lt;flag&gt;   | &lt;parameter&gt; |</span>
+<span class="comment">|------------|------------|-----------|--------------|</span>
+<span class="comment">| dbt        | build      | --select | fct_orders+  |</span></div>
 
-<span class="cmd">dbt test</span>
-<span class="comment"># Runs all tests. Fails the command if any test returns rows.</span>
+<p>Flags like <code class="inline">--select</code>, <code class="inline">--exclude</code>, and <code class="inline">--full-refresh</code> modify command behavior.</p>
+<div class="code"><span class="cmd">dbt build --help</span></div>
 
-<span class="cmd">dbt build</span>
-<span class="comment"># run + test + seed + snapshot in dependency order. The "do everything" command.</span>
-
-<span class="cmd">dbt compile</span>
-<span class="comment"># Renders Jinja but doesn't run anything. Great for debugging SQL.</span>
-
-<span class="cmd">dbt seed</span>
-<span class="comment"># Loads CSV files from seeds/ into the warehouse.</span>
-
-<span class="cmd">dbt snapshot</span>
-<span class="comment"># Runs snapshot logic.</span>
-
-<span class="cmd">dbt docs generate && dbt docs serve</span>
-<span class="comment"># Generates the data catalog and serves it locally at localhost:8080</span>
-
-<span class="cmd">dbt deps</span>
-<span class="comment"># Installs packages from packages.yml (like npm install).</span>
-
-<span class="cmd">dbt source freshness</span>
-<span class="comment"># Checks that source tables have been updated recently.</span></div>
-
-    <h3 class="section-title">The selector syntax (--select)</h3>
-
-    <p>The <code class="inline">--select</code> flag is incredibly powerful. Selectors can be combined with spaces (union) or commas.</p>
-
-    <div class="code"><span class="comment"># Downstream: model + everything that depends on it</span>
-<span class="cmd">dbt run --select mart_orders+</span>
-
-<span class="comment"># Upstream: everything mart_orders depends on</span>
-<span class="cmd">dbt run --select +mart_orders</span>
-
-<span class="comment"># Between two nodes</span>
-<span class="cmd">dbt run --select +mart_orders+2</span>
-<span class="comment"># (up to 2 layers downstream)</span>
-
-<span class="comment"># By tag</span>
-<span class="cmd">dbt run --select tag:nightly</span>
-
-<span class="comment"># Modified models only (great in CI)</span>
-<span class="cmd">dbt run --select state:modified+</span></div>
+<div class="code"><span class="cmd">dbt build</span>                                         <span class="comment"># Build the entire project in DAG order.</span>
+<span class="cmd">dbt build --select fct_orders</span>                     <span class="comment"># Build a single fact model and its tests.</span>
+<span class="cmd">dbt build --select +fct_orders</span>                    <span class="comment"># Build fct_orders and all upstream dependencies.</span>
+<span class="cmd">dbt build --select fct_orders+</span>                    <span class="comment"># Build fct_orders and all downstream dependents.</span>
+<span class="cmd">dbt build --select +fct_orders+</span>                   <span class="comment"># Build a model with both upstream and downstream nodes.</span>
+<span class="cmd">dbt build --select staging.*</span>                      <span class="comment"># Build everything inside the staging/ folder.</span>
+<span class="cmd">dbt build --select marts.finance</span>                  <span class="comment"># Build only the finance mart subtree.</span>
+<span class="cmd">dbt build --select tag:daily</span>                      <span class="comment"># Build all resources tagged daily.</span>
+<span class="cmd">dbt build --select path:models/staging</span>            <span class="comment"># Build everything inside models/staging.</span>
+<span class="cmd">dbt build --exclude tag:deprecated</span>                <span class="comment"># Build everything except deprecated resources.</span></div>
+<div class="code"><span class="cmd">dbt debug</span>                                         <span class="comment"># Validate project setup and warehouse connection.</span>
+<span class="cmd">dbt deps</span>                                          <span class="comment"># Install packages from packages.yml.</span>
+<span class="cmd">dbt parse</span>                                         <span class="comment"># Parse the project without executing SQL.</span>
+<span class="cmd">dbt compile --select fct_orders</span>                   <span class="comment"># Generate compiled SQL for a single model.</span>
+<span class="cmd">dbt run --select stg_orders</span>                       <span class="comment"># Execute one staging model.</span>
+<span class="cmd">dbt test --select fct_orders</span>                      <span class="comment"># Run tests associated with fct_orders.</span>
+<span class="cmd">dbt seed --full-refresh</span>                           <span class="comment"># Reload all seed CSVs from scratch.</span>
+<span class="cmd">dbt snapshot --select orders_snapshot</span>             <span class="comment"># Execute a specific snapshot.</span>
+<span class="cmd">dbt docs generate && dbt docs serve</span>               <span class="comment"># Generate and locally serve project documentation.</span>
+<span class="cmd">dbt run-operation generate_schema_name</span>            <span class="comment"># Execute a macro directly from the CLI.</span></div>
 
     <div class="callout green">
       <strong>The through line</strong>
