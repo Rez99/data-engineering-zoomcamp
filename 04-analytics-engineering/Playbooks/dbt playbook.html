@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>dbt Story Arc</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #fafafa;
+  --card: #ffffff;
+  --border: #e5e7eb;
+  --border-strong: #d1d5db;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --faint: #9ca3af;
+  --purple-bg: #f2efff;
+  --purple-border: #c9c0ff;
+  --purple-text: #4338ca;
+  --green-bg: #ecfdf5;
+  --green-border: #a7f3d0;
+  --green-text: #047857;
+  --amber-bg: #fffbeb;
+  --amber-border: #fde68a;
+  --amber-text: #b45309;
+  --blue-bg: #eff6ff;
+  --blue-border: #bfdbfe;
+  --blue-text: #1d4ed8;
+  --radius: 16px;
+  --shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.65;
+  padding: 32px;
+}
+
+.container { max-width: 980px; margin: 0 auto; }
+
+.hero { margin-bottom: 36px; }
+.hero-kicker {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+.hero h1 { font-size: 44px; line-height: 1.08; margin-bottom: 16px; }
+.hero p { color: var(--muted); font-size: 18px; max-width: 760px; }
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 44px;
+  padding: 12px 0 18px;
+  background: rgba(250,250,250,0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+.nav button {
+  border: 1px solid var(--border);
+  background: white;
+  border-radius: 999px;
+  padding: 8px 13px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--muted);
+  transition: 0.15s ease;
+}
+.nav button:hover { background: var(--purple-bg); border-color: var(--purple-border); color: var(--purple-text); }
+
+.chapter {
+  scroll-margin-top: 92px;
+  margin-bottom: 74px;
+  padding-bottom: 56px;
+  border-bottom: 1px solid var(--border);
+}
+.chapter:last-child { border-bottom: 0; }
+.chapter-header { margin-bottom: 26px; }
+.chapter-number {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--faint);
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+.chapter-title { font-size: 32px; line-height: 1.2; margin-bottom: 10px; }
+.chapter-subtitle { color: var(--muted); font-size: 17px; max-width: 780px; }
+.section-title { margin: 30px 0 12px; font-size: 20px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+.grid.small { grid-template-columns: repeat(auto-fit, minmax(205px, 1fr)); }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+.card h3 { font-size: 18px; margin-bottom: 10px; }
+.card h4 { font-size: 15px; margin-bottom: 8px; }
+.card p { color: var(--muted); font-size: 15px; }
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+.badge.purple { background: var(--purple-bg); color: var(--purple-text); }
+.badge.green { background: var(--green-bg); color: var(--green-text); }
+.badge.amber { background: var(--amber-bg); color: var(--amber-text); }
+.badge.blue { background: var(--blue-bg); color: var(--blue-text); }
+
+.callout {
+  border-left: 4px solid var(--purple-border);
+  background: white;
+  padding: 18px 20px;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  margin: 26px 0;
+  box-shadow: var(--shadow);
+}
+.callout strong { display: block; margin-bottom: 6px; }
+.callout.green { border-left-color: var(--green-border); }
+.callout.amber { border-left-color: var(--amber-border); }
+
+.code, .tree, pre.diagram {
+  position: relative;
+  background: #111827;
+  color: #f9fafb;
+  border-radius: var(--radius);
+  padding: 18px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  overflow-x: auto;
+  font-size: 14px;
+  margin: 20px 0;
+  white-space: pre;
+  line-height: 1.65;
+}
+.tree {
+  background: transparent;
+  color: var(--text);
+  border: 0;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+}
+.code .muted { color: #9ca3af; }
+.code .comment { color: #9ca3af; }
+.code .cmd { color: #fbbf24; }
+.code .pkg { color: #fbbf24; }
+.code .yaml-key { color: #86efac; }
+.code .yaml-value { color: #93c5fd; }
+
+.table-wrap { overflow-x: auto; margin: 24px 0; border-radius: var(--radius); }
+table { width: 100%; border-collapse: collapse; background: white; }
+th, td { border: 1px solid var(--border); padding: 14px; text-align: left; vertical-align: top; }
+th { background: #f8fafc; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+td { font-size: 14px; }
+
+.flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 24px 0; }
+.flow-box { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 13px 16px; font-size: 14px; box-shadow: var(--shadow); }
+.arrow { color: var(--faint); }
+
+.takeaway {
+  margin-top: 24px;
+  padding: 18px 20px;
+  border-radius: var(--radius);
+  background: var(--purple-bg);
+  color: var(--purple-text);
+  font-weight: 700;
+}
+
+ul { padding-left: 22px; color: var(--muted); margin: 10px 0 18px; }
+li { margin-bottom: 8px; }
+strong { color: var(--text); }
+code.inline { background: #f3f4f6; padding: 2px 6px; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+
+@media (max-width: 640px) {
+  body { padding: 18px; }
+  .hero h1 { font-size: 32px; }
+  .chapter-title { font-size: 26px; }
+  .nav { position: static; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <section class="hero">
+    <div class="hero-kicker">dbt learning arc</div>
+    <h1>dbt Story Arc</h1>
+    <p>
+      A systems-first guide to dbt: why it exists, how the project is structured,
+      how resources map to files, how models layer from raw sources to marts, and how commands act on the graph.
+    </p>
+  </section>
+
+  <div class="nav">
+    <button onclick="scrollToChapter('why-dbt')">1 Why dbt</button>
+    <button onclick="scrollToChapter('install')">2 Install</button>
+    <button onclick="scrollToChapter('project-profiles')">3 Project vs profiles</button>
+    <button onclick="scrollToChapter('resources')">4 Resources</button>
+    <button onclick="scrollToChapter('model-path')">5 Model path</button>
+    <button onclick="scrollToChapter('materializations')">6 Materializations</button>
+    <button onclick="scrollToChapter('commands')">7 Commands</button>
+  </div>
+
+  <section class="chapter" id="why-dbt">
+    <div class="chapter-header">
+      <div class="chapter-number">Chapter 1 of 7</div>
+      <h2 class="chapter-title">Why dbt?</h2>
+      <p class="chapter-subtitle">
+        dbt matters because analytics SQL eventually stops being “just queries”
+        and starts becoming a system of interconnected transformations.
+      </p>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="badge purple">Standardization</div>
+        <h3>One shared language</h3>
+        <p>dbt creates a unified workflow for organizing transformations, testing assumptions, generating documentation, and collaborating across warehouses and teams.</p>
+      </div>
+      <div class="card">
+        <div class="badge green">Abstraction</div>
+        <h3>Focus on the transformation</h3>
+        <p>Models are usually declarative SELECT statements while dbt handles materialization and orchestration boilerplate behind the scenes.</p>
+      </div>
+      <div class="card">
+        <div class="badge amber">Layered modeling</div>
+        <h3>Stable transformation layers</h3>
+        <p>Staging, intermediate, and mart layers create stable boundaries between transformations and isolate upstream changes from downstream consumers.</p>
+      </div>
+      <div class="card">
+        <div class="badge blue">Lineage</div>
+        <h3>See how everything connects</h3>
+        <p>dbt automatically tracks upstream dependencies and downstream consumers, turning scattered SQL into a visible transformation graph.</p>
+      </div>
+      <div class="card">
+        <div class="badge purple">Dependencies & orchestration</div>
+        <h3>Correct build order</h3>
+        <p>dbt determines what needs to run first and coordinates execution in the warehouse, removing fragile manual ordering.</p>
+      </div>
+      <div class="card">
+        <div class="badge green">Testing & documentation</div>
+        <h3>Contracts beside the logic</h3>
+        <p>Assertions and documentation live alongside the transformations themselves instead of drifting into wikis, spreadsheets, or tribal knowledge.</p>
+      </div>
+    </div>
+
+    <div class="takeaway">One-line takeaway: dbt turns SQL transformations into a standardized, layered, dependency-aware system.</div>
+  </section>
+
+  <section class="chapter" id="install">
+    <div class="chapter-header">
+      <div class="chapter-number">Chapter 2 of 7</div>
+      <h2 class="chapter-title">Install</h2>
+      <p class="chapter-subtitle">Getting from nothing to a working project skeleton.</p>
+    </div>
+
+    <h3 class="section-title">Installation</h3>
+    <p>dbt has a core package and adapter-specific packages. You install the adapter for your warehouse — the adapter pulls in dbt-core automatically.</p>
+
+    <div class="code"><span class="comment"># For DuckDB (great for local dev)</span>
+<span class="cmd">pip install</span> <span class="pkg">dbt-duckdb</span>
+
+<span class="comment"># For Snowflake, BigQuery, Redshift, Postgres...</span>
+<span class="cmd">pip install</span> <span class="pkg">dbt-snowflake</span>
+<span class="cmd">pip install</span> <span class="pkg">dbt-bigquery</span>
+<span class="cmd">pip install</span> <span class="pkg">dbt-postgres</span></div>
+
+    <h3 class="section-title">Creating a project</h3>
+
+    <div class="code"><span class="cmd">dbt init</span> <span class="pkg">my_project</span>
+<span class="comment"># Follow the prompts: choose your adapter, name your project</span></div>
+
+    <p>This generates a project skeleton.</p>
+
+    <div class="grid">
+      <div class="card">
+        <div class="badge blue">Connection config</div>
+        <div class="tree">~/.dbt/
+└── profiles.yml</div>
+      </div>
+
+      <div class="card">
+        <div class="badge purple">Project repo</div>
+        <div class="tree">my_project/
+├── dbt_project.yml
+├── README.md
+├── analyses/
+├── macros/
+├── models/
+├── seeds/
+├── snapshots/
+└── tests/</div>
+      </div>
+    </div>
+
+    <div class="takeaway">One-line takeaway: dbt init creates the skeleton for a structured, shareable transformation project.</div>
+  </section>
+
+  <section class="chapter" id="project-profiles">
+    <div class="chapter-header">
+      <div class="chapter-number">Chapter 3 of 7</div>
+      <h2 class="chapter-title">Project vs profiles — the key split</h2>
+      <p class="chapter-subtitle">This is the most important conceptual distinction in dbt. Get this and everything else clicks.</p>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="badge purple">dbt_project.yml</div>
+        <h3>What to build</h3>
+        <p>Lives inside your repo. Contains project name, model configs, variable defaults, and resource settings. Gets committed to Git and shared with your team.</p>
+      </div>
+      <div class="card">
+        <div class="badge green">profiles.yml</div>
+        <h3>How to connect</h3>
+        <p>Lives in <code class="inline">~/.dbt/</code> on your machine. Contains credentials, host, database, schema, and environment targets. Never committed. Different per person/environment.</p>
+      </div>
+    </div>
+
+    <div class="callout green">
+      <strong>Why this split?</strong>
+      SQL transformation logic is shareable. Credentials are not. dbt keeps them physically separate so you can push code to GitHub without leaking passwords. In CI/CD, credentials usually come from environment variables injected at runtime.
+    </div>
+
+    <h3 class="section-title">What dbt_project.yml actually looks like</h3>
+    <div class="code"><span class="comment"># Name your project! Project names should contain only lowercase characters</span>
+<span class="comment"># and underscores. A good package name should reflect your organization's</span>
+<span class="comment"># name or the intended use of these models</span>
+<span class="yaml-key">name:</span> <span class="yaml-value">'dbt_test_project'</span>
+<span class="yaml-key">version:</span> <span class="yaml-value">'1.0.0'</span>
+
+<span class="comment"># This setting configures which profile dbt uses for this project.</span>
+<span class="yaml-key">profile:</span> <span class="yaml-value">'dbt_test_project'</span>
+
+<span class="comment"># These configurations specify where dbt should look for different types of files.</span>
+<span class="comment"># The `model-paths` config, for example, states that models in this project can be</span>
+<span class="comment"># found in the "models/" directory. You probably won't need to change these!</span>
+<span class="yaml-key">model-paths:</span> <span class="yaml-value">["models"]</span>
+<span class="yaml-key">analysis-paths:</span> <span class="yaml-value">["analyses"]</span>
+<span class="yaml-key">test-paths:</span> <span class="yaml-value">["tests"]</span>
+<span class="yaml-key">seed-paths:</span> <span class="yaml-value">["seeds"]</span>
+<span class="yaml-key">macro-paths:</span> <span class="yaml-value">["macros"]</span>
+<span class="yaml-key">snapshot-paths:</span> <span class="yaml-value">["snapshots"]</span>
+
+<span class="yaml-key">clean-targets:</span>            <span class="comment"># directories to be removed by `dbt clean`</span>
+  - <span class="yaml-value">"target"</span>
+  - <span class="yaml-value">"dbt_packages"</span>
+
+<span class="comment"># Configuring models</span>
+<span class="comment"># Full documentation: https://docs.getdbt.com/docs/configuring-models</span>
+
+<span class="comment"># In this example config, we tell dbt to build all models in the example/</span>
+<span class="comment"># directory as views. These settings can be overridden in the individual model</span>
+<span class="comment"># files using the `{{ config(...) }}` macro.</span>
+<span class="yaml-key">models:</span>
+  <span class="yaml-key">dbt_test_project:</span>
+    <span class="comment"># Config indicated by + and applies to all files under models/example/</span>
+    <span class="yaml-key">example:</span>
+      <span class="yaml-key">+materialized:</span> <span class="yaml-value">view</span></div>
+
+    <h3 class="section-title">What profiles.yml looks like</h3>
+    <div class="code"><span class="yaml-key">dbt_test_project:</span>
+  <span class="yaml-key">outputs:</span>
+    <span class="yaml-key">dev:</span>
+      <span class="yaml-key">type:</span> <span class="yaml-value">duckdb</span>
+      <span class="yaml-key">path:</span> <span class="yaml-value">dev.duckdb</span>
+      <span class="yaml-key">threads:</span> <span class="yaml-value">1</span>
+
+    <span class="yaml-key">prod:</span>
+      <span class="yaml-key">type:</span> <span class="yaml-value">duckdb</span>
+      <span class="yaml-key">path:</span> <span class="yaml-value">prod.duckdb</span>
+      <span class="yaml-key">threads:</span> <span class="yaml-value">4</span>
+
+  <span class="yaml-key">target:</span> <span class="yaml-value">dev</span></div>
+
+    <div class="takeaway">One-line takeaway: dbt_project.yml defines the transformation project; profiles.yml defines how dbt connects to the warehouse.</div>
+  </section>
+
+  <section class="chapter" id="resources">
+    <div class="chapter-header">
+      <div class="chapter-number">Chapter 4 of 7</div>
+      <h2 class="chapter-title">Project anatomy: resources</h2>
+      <p class="chapter-subtitle">Resources are the different kinds of objects dbt knows how to build, test, document, or manage.</p>
+    </div>
+
+    <h3 class="section-title">Resources</h3>
+    <p>Resources are the different kinds of objects dbt knows how to build, test, document, or reason about.</p>
+
+    <h3 class="section-title">Core transformation primitives</h3>
+    <div class="grid">
+      <div class="card"><div class="badge amber">Core</div><h3>Sources</h3><p>Raw tables already in your warehouse.</p></div>
+
+      <div class="card"><div class="badge amber">Core</div><h3>Models</h3><p>A SQL SELECT that becomes a table or view.</p></div>
+
+      <div class="card"><div class="badge amber">Core</div><h3>Data tests</h3><p>Assertions about your data.</p></div>
+
+      <div class="card"><div class="badge amber">Core</div><h3>Macros</h3><p>Reusable Jinja functions.</p></div>
+    </div>
+
+    <h3 class="section-title">Supporting workflow resources</h3>
+    <div class="grid">
+      <div class="card"><div class="badge blue">Supporting</div><h3>Seeds</h3><p>CSVs loaded as tables.</p></div>
+
+      <div class="card"><div class="badge blue">Supporting</div><h3>Snapshots</h3><p>Historical change tracking.</p></div>
+
+      <div class="card"><div class="badge blue">Supporting</div><h3>Docs</h3><p>Documentation that dbt can build and serve.</p></div>
+
+      <div class="card"><div class="badge blue">Supporting</div><h3>Analysis</h3><p>Version-controlled analytical SQL that is not materialized.</p></div>
+    </div>
+
+    <h3 class="section-title">Ecosystem & semantic layer</h3>
+    <div class="grid">
+      <div class="card"><div class="badge green">Ecosystem</div><h3>Exposures</h3><p>Definitions of downstream consumers and use cases.</p></div>
+
+      <div class="card"><div class="badge green">Ecosystem</div><h3>Metrics</h3><p>Definitions of reusable business metrics.</p></div>
+
+      <div class="card"><div class="badge green">Ecosystem</div><h3>Groups</h3><p>Collaborative node organization and ownership concepts.</p></div>
+
+      <div class="card"><div class="badge green">Ecosystem</div><h3>Semantic models</h3><p>Foundational semantic-layer relationships used by MetricFlow.</p></div>
+    </div>
+
+    <div class="takeaway">One-line takeaway: Some dbt resources are central to the transformation DAG, while others support workflows, governance, or the semantic layer.</div>
+  </section>
+
+  <section class="chapter" id="model-path">
+    <div class="chapter-header">
+      <div class="chapter-number">Chapter 5 of 7</div>
+      <h2 class="chapter-title">The core path: sources → models → marts</h2>
+      <p class="chapter-subtitle">Models are the heart of dbt. Most projects follow a layered path from sources → staging → intermediate → marts.</p>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 220px 320px 1fr; row-gap:8px; column-gap:28px; align-items:center; margin:56px 0;">
+
+      <div></div>
+      <div class="flow-box" style="text-align:center; padding:18px 28px; border-color:#8dd9c0; background:#eefcf6; color:#14532d;">Sources</div>
+      <div style="font-size:14px; color:var(--muted); line-height:1.6;">
+        <strong>Raw data.</strong> Use <code class="inline">source()</code> when pointing at warehouse tables dbt did not create.
+      </div>
+
+      <div></div>
+      <div style="font-size:22px; line-height:1; color:var(--faint); text-align:center; margin:-6px 0;">↓</div>
+      <div></div>
+
+      <div></div>
+      <div class="flow-box" style="text-align:center; padding:18px 28px; border-color:#b7a7ff; background:#f6f3ff; color:#4338ca;">Staging models</div>
+      <div style="font-size:14px; color:var(--muted); line-height:1.6;">
+        <strong>Clean & rename.</strong> Usually built from <code class="inline">source()</code>. One staging model per source table. Just clean and rename. No joins in staging.
+      </div>
+
+      <div></div>
+      <div style="font-size:22px; line-height:1; color:var(--faint); text-align:center; margin:-6px 0;">↓</div>
+      <div></div>
+
+      <div></div>
+      <div class="flow-box" style="text-align:center; padding:18px 28px; border-color:#b7a7ff; background:#f6f3ff; color:#4338ca;">Intermediate models</div>
+      <div style="font-size:14px; color:var(--muted); line-height:1.6;">
+        <strong>Join & enrich.</strong> Usually built from upstream models via <code class="inline">ref()</code>.
+      </div>
+
+      <div></div>
+      <div style="font-size:22px; line-height:1; color:var(--faint); text-align:center; margin:-6px 0;">↓</div>
+      <div></div>
+
+      <div></div>
+      <div class="flow-box" style="text-align:center; padding:18px 28px; border-color:#b7a7ff; background:#f6f3ff; color:#4338ca;">Marts</div>
+      <div style="font-size:14px; color:var(--muted); line-height:1.6;">
+        <strong>Business logic.</strong> Final business-facing models.
+      </div>
+
+      <div></div>
+      <div style="font-size:22px; line-height:1; color:var(--faint); text-align:center; margin:-6px 0;">↓</div>
+      <div></div>
+
+      <div></div>
+      <div class="flow-box" style="text-align:center; padding:18px 28px; border-color:#f2c27b; background:#fff7eb; color:#92400e;">BI Tools / Consumers</div>
+      <div style="font-size:14px; color:var(--muted); line-height:1.6;">
+        <strong>Analysts query.</strong>
+      </div>
+
+    </div>
+
+    <div class="takeaway">One-line takeaway: dbt projects organize transformations into stable layers between raw data and business-facing outputs.</div>
+  </section>
+
+  <section class="chapter" id="materializations">
+    <div class="chapter-header">
+      <div class="chapter-number">Chapter 6 of 7</div>
+      <h2 class="chapter-title">Materialization: what does a model become?</h2>
+      <p class="chapter-subtitle">A model starts as a SELECT statement. Materialization tells dbt how to persist it in the warehouse.</p>
+    </div>
+
+    <div class="grid">
+      <div class="card"><div class="badge purple">view</div><h3>Logical query</h3><p>Cheap to build. Recomputed when queried. Good for staging and lightweight transforms.</p></div>
+      <div class="card"><div class="badge green">table</div><h3>Physical result</h3><p>Stored as a table. Faster for consumers, but must be rebuilt.</p></div>
+      <div class="card"><div class="badge amber">incremental</div><h3>Append/update new data</h3><p>Only processes new or changed records after the first run. Important for large datasets.</p></div>
+      <div class="card"><div class="badge blue">ephemeral</div><h3>Inlined CTE</h3><p>Not stored separately. dbt injects the SQL into downstream models.</p></div>
+    </div>
+
+    <h3 class="section-title">Materializations are often configured by layer</h3>
+    <div class="code"><span class="comment"># dbt_project.yml</span>
+
+<span class="yaml-key">models:</span>
+  <span class="yaml-key">taxi_rides_ny:</span>
+    <span class="yaml-key">staging:</span>
+      <span class="yaml-key">+materialized:</span> <span class="yaml-value">view</span>
+    <span class="yaml-key">marts:</span>
+      <span class="yaml-key">+materialized:</span> <span class="yaml-value">table</span></div>
+
+    <div class="takeaway">One-line takeaway: Materialization controls how dbt persists a model inside the warehouse.</div>
+  </section>
+
+  <section class="chapter" id="commands">
+    <div class="chapter-header">
+      <div class="chapter-number">Chapter 7 of 7</div>
+      <h2 class="chapter-title">Commands as actions on the project</h2>
+      <p class="chapter-subtitle">Commands make more sense once you know what dbt is operating on.</p>
+    </div>
+
+    <h3 class="section-title">Core commands</h3>
+
+    <div class="code"><span class="cmd">dbt debug</span>
+<span class="comment"># Always run this first. Validates your profile connection and project config.</span>
+
+<span class="cmd">dbt run</span>
+<span class="comment"># Executes all models. Builds tables/views in your warehouse.</span>
+
+<span class="cmd">dbt run --select stg_orders</span>
+<span class="comment"># Run just one model</span>
+
+<span class="cmd">dbt run --select staging.*</span>
+<span class="comment"># Run all models in the staging/ folder</span>
+
+<span class="cmd">dbt run --select +mart_revenue</span>
+<span class="comment"># Run mart_revenue AND all its upstream dependencies</span>
+
+<span class="cmd">dbt test</span>
+<span class="comment"># Runs all tests. Fails the command if any test returns rows.</span>
+
+<span class="cmd">dbt build</span>
+<span class="comment"># run + test + seed + snapshot in dependency order. The "do everything" command.</span>
+
+<span class="cmd">dbt compile</span>
+<span class="comment"># Renders Jinja but doesn't run anything. Great for debugging SQL.</span>
+
+<span class="cmd">dbt seed</span>
+<span class="comment"># Loads CSV files from seeds/ into the warehouse.</span>
+
+<span class="cmd">dbt snapshot</span>
+<span class="comment"># Runs snapshot logic.</span>
+
+<span class="cmd">dbt docs generate && dbt docs serve</span>
+<span class="comment"># Generates the data catalog and serves it locally at localhost:8080</span>
+
+<span class="cmd">dbt deps</span>
+<span class="comment"># Installs packages from packages.yml (like npm install).</span>
+
+<span class="cmd">dbt source freshness</span>
+<span class="comment"># Checks that source tables have been updated recently.</span></div>
+
+    <h3 class="section-title">The selector syntax (--select)</h3>
+
+    <p>The <code class="inline">--select</code> flag is incredibly powerful. Selectors can be combined with spaces (union) or commas.</p>
+
+    <div class="code"><span class="comment"># Downstream: model + everything that depends on it</span>
+<span class="cmd">dbt run --select mart_orders+</span>
+
+<span class="comment"># Upstream: everything mart_orders depends on</span>
+<span class="cmd">dbt run --select +mart_orders</span>
+
+<span class="comment"># Between two nodes</span>
+<span class="cmd">dbt run --select +mart_orders+2</span>
+<span class="comment"># (up to 2 layers downstream)</span>
+
+<span class="comment"># By tag</span>
+<span class="cmd">dbt run --select tag:nightly</span>
+
+<span class="comment"># Modified models only (great in CI)</span>
+<span class="cmd">dbt run --select state:modified+</span></div>
+
+    <div class="callout green">
+      <strong>The through line</strong>
+      dbt commands operate on the project graph. They are not random CLI verbs; they are actions against models, sources, seeds, snapshots, tests, docs, and the dependency graph created by <code class="inline">ref()</code> and <code class="inline">source()</code>.
+    </div>
+
+    <div class="takeaway">One-line takeaway: dbt commands operate on the transformation graph defined by your project.</div>
+  </section>
+
+</div>
+
+<script>
+function scrollToChapter(id) {
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>
